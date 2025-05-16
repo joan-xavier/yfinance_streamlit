@@ -42,14 +42,9 @@ While many stock prediction projects focus on just one model, this project uniqu
 
 ### 1. Clone the Repo
 
-```bash
-git clone https://github.com/your-username/yfinance_streamlit.git
-cd yfinance_streamlit
-
 ### 2. Install dependancies
 
 pip install -r requirements.txt
-
 
 ### 3. Run the app
 streamlit run filename.py
