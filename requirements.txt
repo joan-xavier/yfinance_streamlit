@@ -8,6 +8,5 @@ scikit-learn==1.4.2
 statsmodels==0.14.2
 tensorflow==2.12.0
 xgboost==2.0.3
-ydata-profiling==4.8.3
 cufflinks==0.17.3
-streamlit-pandas-profiling==0.1.3
+
