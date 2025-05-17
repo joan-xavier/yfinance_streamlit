@@ -1,12 +1,12 @@
 streamlit==1.35.0
 yfinance==0.2.36
 plotly==5.21.0
-pandas==2.2.2
-numpy==1.24.4
+pandas==1.5.3
+numpy==1.23.5
 matplotlib==3.8.4
 scikit-learn==1.4.2
 statsmodels==0.14.2
 tensorflow==2.12.0
 xgboost==2.0.3
 cufflinks==0.17.3
-
+seaborn==0.12.2
