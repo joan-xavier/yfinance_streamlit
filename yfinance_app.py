@@ -5,6 +5,7 @@ import plotly.express as px
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+import seaborn as sns
 import cufflinks as cf
 from statsmodels.tsa.arima.model import ARIMA
 from sklearn.linear_model import LogisticRegression
@@ -18,11 +19,18 @@ from statsmodels.tsa.statespace.sarimax import SARIMAX
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense
 
+
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 import plotly.graph_objects as go
 
-### Details of YAhoo finance:
+
+ ### Details of YAhoo finance:
+#  The following ticker symbols   AAPL -apple stocks;  GOOGL - google;  MSFT- Microsoft
+
+
+
+# st.title("Real world Yahoo stocks Dashboard -Interactive App")
 # App title
 st.markdown('''
 ## Real world Stocks Price and Forecasting Dashboard -Interactive App
@@ -123,7 +131,7 @@ if start_date is not None and end_date is not None:
         # Display the chart
         st.plotly_chart(fig)
 
-        
+        #$$$$$$$$$$$$$$$$$$$$$4
         # Tab 2 , part 2: ARIMA
         # Split data into train and test
         train_size = int(len(stockData) * 0.7)
@@ -166,11 +174,11 @@ if start_date is not None and end_date is not None:
         plt.legend()
         plt.show()
         st.pyplot(plt)
-        #
+        #$$$$$$$$$$$$$$$$$$$
 
         # Tab 2, part 3: LSTM
 
-        # 
+        # %%%%%%%%%%%%%%%%%%
         # Streamlit App Title
         st.subheader("LSTM Stock Price Prediction Dashboard")
         seq_length = st.selectbox("Forecasting sequence length in days", (1, 7, 14, 30, 45, 60))
@@ -391,7 +399,7 @@ if start_date is not None and end_date is not None:
         plt.show()
         st.pyplot(fig)
 
-        # 4c. 
+        ### 4c. 
         # Bollinger bands
         st.subheader(f' Bollinger Bands for {ticker_symbol}')
         st.markdown(''' #### To visualize price volatility and potential overbought/oversold conditions on stock charts [Click for more details](https://www.fidelity.com/learning-center/trading-investing/technical-analysis/technical-indicator-guide/bollinger-bands)''')
@@ -402,7 +410,7 @@ if start_date is not None and end_date is not None:
         st.plotly_chart(fig)
         
 
-        # 4d.
+        ### 4d.
         st.subheader(f"Closing Price in (USD) with {ma_window}-Days Moving Average")
         fig, ax = plt.subplots(figsize=(10, 5))
         ax.plot(stockData.index, stockData['Close'], label="Closing Price", color='blue')
@@ -424,11 +432,9 @@ if start_date is not None and end_date is not None:
         st.write(ticker.financials.head())
 
     
-
-
      # Tab 5: stock history tab   
     with EDA_tab:
-        #
+        ###
 
         st.header(" Comparative EDA for Popular Stocks")
         tickers = ['AAPL','GOOGL','META','MSFT','TSLA','BTC-USD']
@@ -443,7 +449,7 @@ if start_date is not None and end_date is not None:
         correlation = returns.corr()
 
         # -- 1. Cumulative Returns Line Chart
-        st.subheader("📈 Cumulative Returns")
+        st.subheader(" Cumulative Returns")
         fig1 = px.line(cumulative_returns, title="Cumulative Returns Over Time")
         st.plotly_chart(fig1)
 
@@ -474,19 +480,39 @@ if start_date is not None and end_date is not None:
 
         # -- 5. Up vs Down Days Confusion Matrix
         st.subheader("Confusion Matrix: Movement Consistency")
+
         for ticker in tickers:
             direction = np.where(returns[ticker] > 0, 1, 0)
             y_true = direction[:-1]
             y_pred = direction[1:]
             cm = confusion_matrix(y_true, y_pred)
-            fig, ax = plt.subplots()
-            sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False,
-                        xticklabels=['Down', 'Up'], yticklabels=['Down', 'Up'])
-            ax.set_title(f'{ticker} - Confusion Matrix (Next Day vs Today)')
-            ax.set_xlabel('Predicted')
-            ax.set_ylabel('Actual')
+
+            # Smaller figure size
+            fig, ax = plt.subplots(figsize=(1, 1))  # width, height in inches
+
+            # Heatmap with small annotation text
+            sns.heatmap(
+                cm,
+                annot=True,
+                fmt='d',
+                cmap='Blues',
+                cbar=False,
+                xticklabels=['Down', 'Up'],
+                yticklabels=['Down', 'Up'],
+                annot_kws={"size": 3},  # smaller numbers
+                ax=ax
+            )
+
+            # Axis label and title font sizes
+            ax.set_title(f'{ticker}', fontsize=5)
+            ax.set_xlabel('Predicted', fontsize=5)
+            ax.set_ylabel('Actual', fontsize=5)
+            ax.tick_params(axis='both', labelsize=3)  # smaller tick labels
+
+            # Render in Streamlit
             st.pyplot(fig)
-        #
+
+        ####
 else:
     st.error("No data found. Please choose the 'ticker symbol' and 'date range' of your choice from the Side bar.")
     st.stop()
