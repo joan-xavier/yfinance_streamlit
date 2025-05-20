@@ -97,13 +97,18 @@ if start_date is not None and end_date is not None:
         # ARIMA model
         arima_model = ARIMA(train["Close"], order=(1,1,1))  
         arima_fit = arima_model.fit()
-        arima_forecast = arima_fit.forecast(steps=len(test))
+        # arima_forecast = arima_fit.forecast(steps=len(test))
+        arima_forecast = arima_fit.get_forecast(steps=len(test)).predicted_mean
+
 
         # ARIMAX model (adding exogenous variable if available, e.g., 'Volume')
         if 'Volume' in stockData.columns:
             arimax_model = SARIMAX(train["Close"], exog=train["Volume"], order=(1,1,1))
             arimax_fit = arimax_model.fit()
-            arimax_forecast = arimax_fit.forecast(steps=len(test), exog=test["Volume"])
+            # arimax_forecast = arimax_fit.forecast(steps=len(test), exog=test["Volume"])
+            arimax_forecast = arimax_fit.get_forecast(steps=len(test), exog=test["Volume"]).predicted_mean
+
+
         else:
             print("No exogenous variable available for ARIMAX; using ARIMA instead.")
             arimax_forecast = arima_forecast
@@ -111,7 +116,9 @@ if start_date is not None and end_date is not None:
         # SARIMA model
         sarima_model = SARIMAX(train["Close"], order=(1,1,1), seasonal_order=(1,1,1,12))
         sarima_fit = sarima_model.fit()
-        sarima_forecast = sarima_fit.forecast(steps=len(test))
+        # sarima_forecast = sarima_fit.forecast(steps=len(test))
+        sarima_forecast = sarima_fit.get_forecast(steps=len(test)).predicted_mean
+
         # Plot the results
         plt.figure(figsize=(14,7))
 
