@@ -74,6 +74,7 @@ if start_date and end_date:
 
     # Fetching data
     st.write(f"Fetching data for **{ticker_symbol}** from {start_date} to {end_date}")
+    st.info("⏳ Please note: Due to the extensive features and predictive modeling integrated into this app, loading may take a few seconds to a minute. Thank you for your patience!")
     st.subheader(f'{ticker_symbol} Stock Overview')
     
     # stockData = yf.download(ticker_symbol, start =start_date, end = end_date)
