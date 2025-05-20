@@ -142,7 +142,7 @@ if start_date is not None and end_date is not None:
         # plt.show()
         # st.pyplot(plt)
         # #  Reset index AFTER forecasting
-        # stockData.reset_index(inplace=True)
+        stockData.reset_index(inplace=True)
         #$$$$$$$$$$$$$$$$$$$
 
         # Tab 2, part 2 : Rolling window
