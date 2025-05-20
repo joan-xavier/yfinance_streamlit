@@ -134,51 +134,51 @@ if start_date is not None and end_date is not None:
         #$$$$$$$$$$$$$$$$$$$$$4
         # Tab 2 , part 2: ARIMA
    
-        # Ensure DateTimeIndex for ARIMA
-        if 'Date' in stockData.columns:
-            stockData.set_index('Date', inplace=True)
+        # # Ensure DateTimeIndex for ARIMA
+        # if 'Date' in stockData.columns:
+        #     stockData.set_index('Date', inplace=True)
 
-        # Split data into train and test
-        train_size = int(len(stockData) * 0.7)
-        train, test = stockData.iloc[:train_size], stockData.iloc[train_size:]
+        # # Split data into train and test
+        # train_size = int(len(stockData) * 0.7)
+        # train, test = stockData.iloc[:train_size], stockData.iloc[train_size:]
 
-        # ARIMA model
-        arima_model = ARIMA(train["Close"], order=(1,1,1))  
-        arima_fit = arima_model.fit()
-        arima_forecast = arima_fit.forecast(steps=len(test))
+        # # ARIMA model
+        # arima_model = ARIMA(train["Close"], order=(1,1,1))  
+        # arima_fit = arima_model.fit()
+        # arima_forecast = arima_fit.forecast(steps=len(test))
 
-        # ARIMAX model (adding exogenous variable if available, e.g., 'Volume')
-        if 'Volume' in stockData.columns:
-            arimax_model = SARIMAX(train["Close"], exog=train["Volume"], order=(1,1,1))
-            arimax_fit = arimax_model.fit()
-            arimax_forecast = arimax_fit.forecast(steps=len(test), exog=test["Volume"])
-        else:
-            print("No exogenous variable available for ARIMAX; using ARIMA instead.")
-            arimax_forecast = arima_forecast
+        # # ARIMAX model (adding exogenous variable if available, e.g., 'Volume')
+        # if 'Volume' in stockData.columns:
+        #     arimax_model = SARIMAX(train["Close"], exog=train["Volume"], order=(1,1,1))
+        #     arimax_fit = arimax_model.fit()
+        #     arimax_forecast = arimax_fit.forecast(steps=len(test), exog=test["Volume"])
+        # else:
+        #     print("No exogenous variable available for ARIMAX; using ARIMA instead.")
+        #     arimax_forecast = arima_forecast
 
-        # SARIMA model
-        sarima_model = SARIMAX(train["Close"], order=(1,1,1), seasonal_order=(1,1,1,12))
-        sarima_fit = sarima_model.fit()
-        sarima_forecast = sarima_fit.forecast(steps=len(test))
-        # Plot the results
-        plt.figure(figsize=(14,7))
+        # # SARIMA model
+        # sarima_model = SARIMAX(train["Close"], order=(1,1,1), seasonal_order=(1,1,1,12))
+        # sarima_fit = sarima_model.fit()
+        # sarima_forecast = sarima_fit.forecast(steps=len(test))
+        # # Plot the results
+        # plt.figure(figsize=(14,7))
 
-        # Actual data
-        plt.plot(train.index, train["Close"], label='Train', color='#203147')
-        plt.plot(test.index, test["Close"], label='Test', color='#01ef63')
+        # # Actual data
+        # plt.plot(train.index, train["Close"], label='Train', color='#203147')
+        # plt.plot(test.index, test["Close"], label='Test', color='#01ef63')
 
-        # Forecasts
-        plt.plot(test.index, arima_forecast, label='ARIMA Forecast', color='orange', linestyle='--')
-        plt.plot(test.index, arimax_forecast, label='ARIMAX Forecast', color='blue', linestyle='-.')
-        plt.plot(test.index, sarima_forecast, label='SARIMA Forecast', color='red', linestyle=':')
+        # # Forecasts
+        # plt.plot(test.index, arima_forecast, label='ARIMA Forecast', color='orange', linestyle='--')
+        # plt.plot(test.index, arimax_forecast, label='ARIMAX Forecast', color='blue', linestyle='-.')
+        # plt.plot(test.index, sarima_forecast, label='SARIMA Forecast', color='red', linestyle=':')
 
-        # Title and labels
-        plt.title('Comparison of ARIMA, ARIMAX, and SARIMA Models')
-        plt.xlabel('Date')
-        plt.ylabel('Close Price')
-        plt.legend()
-        plt.show()
-        st.pyplot(plt)
+        # # Title and labels
+        # plt.title('Comparison of ARIMA, ARIMAX, and SARIMA Models')
+        # plt.xlabel('Date')
+        # plt.ylabel('Close Price')
+        # plt.legend()
+        # plt.show()
+        # st.pyplot(plt)
         #  Reset index AFTER forecasting
         stockData.reset_index(inplace=True)
         #$$$$$$$$$$$$$$$$$$$
