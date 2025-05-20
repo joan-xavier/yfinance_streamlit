@@ -84,7 +84,56 @@ if start_date is not None and end_date is not None:
     with prediction_tab:
         #$$$$$$$$$$$$$$$$$$$$$4
         st.subheader("Stock Prediction using Time series - ARIMA/SARIMA/ARIMAX Models")
-        # Tab 2, part 1 : ARIMA
+        # Tab 2, part 1 : Rolling window
+     
+        ma_window = st.slider("Rolling Window Size (in Days)", min_value=5, max_value=50, value=10)
+        # Calculate Rolling Mean and Standard Deviation
+        
+        stockData['roll_mean'] = stockData['Close'].rolling(window=ma_window).mean()
+        stockData['roll_std'] = stockData['Close'].rolling(window=ma_window).std()
+    
+    
+        # Safely access the last value of the rolling mean
+        if not stockData['roll_mean'].dropna().empty:
+            mean_value = stockData['roll_mean'].dropna().iloc[-1]
+            std_value = stockData['roll_std'].iloc[-1]
+            st.markdown(f"**Latest Moving Average (Window Size {ma_window}):** {mean_value:.2f}")
+            st.markdown(f"**Latest Standard Deviation (Window Size {ma_window}):** {std_value:.2f}")
+        else:
+            st.warning("Insufficient data to calculate rolling mean. Please choose a smaller window size or a larger data range.")
+    
+    
+        stockData.reset_index(inplace=True)  # Reset index to use Date as a column
+        # Plotting using Plotly Express
+        fig = px.line(stockData, x='Date', y=['Close', 'roll_mean', 'roll_std'],
+                        labels={
+                            "value": "Price (USD)",
+                            "Date": "Date",
+                            "variable": "Legend"
+                        },
+                        title=f"{ticker_symbol} Stock Price with {ma_window}-Day Moving Average and Std Dev")
+    
+        # Customize traces for better visualization
+        fig.for_each_trace(lambda trace: trace.update(mode='lines+markers'))
+        fig.update_traces(line=dict(width=1))
+    
+        # Increase figure size
+        fig.update_layout(
+            width=1000,
+            height=600
+        )
+    
+        # Update legend names
+        fig.for_each_trace(lambda trace: trace.update(name={
+            "Close": "Closing Price",
+            "roll_mean": f"{ma_window}-Day Moving Average",
+            "roll_std": f"{ma_window}-Day Rolling Std Dev"
+        }[trace.name]))
+    
+        # Display the chart
+        st.plotly_chart(fig)
+     ##############################################################
+        # Tab 2, part 2 : ARIMA
        
         # Ensure DateTimeIndex for ARIMA
         # if 'Date' in stockData.columns:
@@ -144,55 +193,7 @@ if start_date is not None and end_date is not None:
         # #  Reset index AFTER forecasting
         stockData.reset_index(inplace=True)
         #$$$$$$$$$$$$$$$$$$$
-
-        # Tab 2, part 2 : Rolling window
-        ma_window = st.slider("Rolling Window Size (in Days)", min_value=5, max_value=50, value=10)
-        # Calculate Rolling Mean and Standard Deviation
-        
-        stockData['roll_mean'] = stockData['Close'].rolling(window=ma_window).mean()
-        stockData['roll_std'] = stockData['Close'].rolling(window=ma_window).std()
-
-
-        # Safely access the last value of the rolling mean
-        if not stockData['roll_mean'].dropna().empty:
-            mean_value = stockData['roll_mean'].dropna().iloc[-1]
-            std_value = stockData['roll_std'].iloc[-1]
-            st.markdown(f"**Latest Moving Average (Window Size {ma_window}):** {mean_value:.2f}")
-            st.markdown(f"**Latest Standard Deviation (Window Size {ma_window}):** {std_value:.2f}")
-        else:
-            st.warning("Insufficient data to calculate rolling mean. Please choose a smaller window size or a larger data range.")
-
-
-        # stockData.reset_index(inplace=True)  # Reset index to use Date as a column
-        # Plotting using Plotly Express
-        fig = px.line(stockData, x='Date', y=['Close', 'roll_mean', 'roll_std'],
-                     labels={
-                         "value": "Price (USD)",
-                         "Date": "Date",
-                         "variable": "Legend"
-                     },
-                     title=f"{ticker_symbol} Stock Price with {ma_window}-Day Moving Average and Std Dev")
-
-        # Customize traces for better visualization
-        fig.for_each_trace(lambda trace: trace.update(mode='lines+markers'))
-        fig.update_traces(line=dict(width=1))
-
-        # Increase figure size
-        fig.update_layout(
-            width=1000,
-            height=600
-        )
-
-        # Update legend names
-        fig.for_each_trace(lambda trace: trace.update(name={
-            "Close": "Closing Price",
-            "roll_mean": f"{ma_window}-Day Moving Average",
-            "roll_std": f"{ma_window}-Day Rolling Std Dev"
-        }[trace.name]))
-
-        # Display the chart
-        st.plotly_chart(fig)
-     
+    
         # Tab 2, part 3: LSTM
 
         # %%%%%%%%%%%%%%%%%%
