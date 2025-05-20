@@ -33,7 +33,7 @@ st.markdown('''
 
 **Credits**
 - App built by [Joanofarc Xavier](https://joan-xavier.github.io/portfolio/) 
-- Built in `Python` using `streamlit`,`yfinance`, `plotly`,`matplotlib`,`seaborn`, `pandas`,`scikit learn`, `Tensorflow`and `datetime`
+- Built in `Python` using `streamlit`,`yfinance`, `plotly`,`matplotlib`, `pandas`,`scikit learn`, `Tensorflow`and `datetime`
 - Trends and Patterns of popular stocks - META, GOOGL, AAPL(Apple), MSFT(Microsoft), TSLA (Tesla) BTC-USD(Bitcoin)
 - Time series Analysis -Stock Prediction using ARIMA, LSTM Models, Logistic Regression, SVM and XGBoost
 ''')
@@ -199,7 +199,7 @@ if start_date and end_date:
 
         # Tab 2, part 3: LSTM
 
-        
+        # %%%%%%%%%%%%%%%%%%
         # Streamlit App Title
         st.subheader("Stock Price Prediction using RNN based LSTM Model ")
         seq_length = st.selectbox("Forecasting sequence length in days", (1, 7, 14, 30, 45, 60))
@@ -388,12 +388,12 @@ if start_date and end_date:
         best_model = max(auc_scores, key=auc_scores.get)
         st.success(f"Best Model: **{best_model}** with ROC-AUC = {auc_scores[best_model]:.4f}")
 
-    # 
+    
     # Tab 3: charts tab
     with chart_tab:
         
         st.write(f" ### {ticker_symbol} Charts with High, low, close prices and Volume (total no of shares traded) for the specified interval ")
-        #4a.
+        # 4a.
 
         st.subheader("High Price, Low Price in (USD) and Volume")
 
@@ -420,7 +420,7 @@ if start_date and end_date:
         plt.show()
         st.pyplot(fig)
 
-        # 4c. 
+        ### 4c. 
         # Bollinger bands
         st.subheader(f' Bollinger Bands for {ticker_symbol}')
         st.markdown(''' #### To visualize price volatility and potential overbought/oversold conditions on stock charts [Click for more details](https://www.fidelity.com/learning-center/trading-investing/technical-analysis/technical-indicator-guide/bollinger-bands)''')
@@ -431,7 +431,7 @@ if start_date and end_date:
         st.plotly_chart(fig)
         
 
-        # 4d.
+        ### 4d.
         st.subheader(f"Closing Price in (USD) with {ma_window}-Days Moving Average")
         fig, ax = plt.subplots(figsize=(10, 5))
         ax.plot(stockData.index, stockData['Close'], label="Closing Price", color='blue')
@@ -444,18 +444,86 @@ if start_date and end_date:
     
 
     # Tab 4: Finance detail tab   
+    
     with finance_tab:
-        st.write(f"Retrieving Financial Statements of {ticker_symbol} stocks")
-        
-        st.write("Balance Sheet:")
-        st.write(ticker.balance_sheet.head())
-        st.write("Financial Statements:")
-        st.write(ticker.financials.head())
+        st.subheader(f" Financial Overview of {ticker_symbol}")
+        st.markdown("Extracting **Balance Sheet**, **Income Statement**, and **Cash Flow** data with trend analysis and key ratios.")
+
+        # Load Statements
+        balance_sheet = ticker.balance_sheet
+        financials = ticker.financials
+        cashflow = ticker.cashflow
+
+        # Convert columns to string dates for better display
+        balance_sheet.columns = balance_sheet.columns.strftime('%Y-%m')
+        financials.columns = financials.columns.strftime('%Y-%m')
+        cashflow.columns = cashflow.columns.strftime('%Y-%m')
+
+        # Show Expandable Sections
+        with st.expander(" Balance Sheet"):
+            st.dataframe(balance_sheet)
+
+        with st.expander(" Income Statement"):
+            st.dataframe(financials)
+
+        with st.expander("Cash Flow Statement"):
+            st.dataframe(cashflow)
+
+        # -- Financial Ratios (most recent column)
+        st.markdown("###  Key Financial Ratios (Latest Available)")
+        try:
+            latest = balance_sheet.columns[0]
+
+            total_assets = balance_sheet.loc["Total Assets", latest]
+            total_liabilities = balance_sheet.loc["Total Liabilities Net Minority Interest", latest]
+            total_equity = balance_sheet.loc["Ordinary Shares Number", latest]  # You may choose another equity measure
+            current_assets = balance_sheet.loc["Current Assets", latest]
+            current_liabilities = balance_sheet.loc["Current Liabilities", latest]
+
+            revenue = financials.loc["Total Revenue", latest]
+            net_income = financials.loc["Net Income", latest]
+
+            current_ratio = current_assets / current_liabilities if current_liabilities != 0 else np.nan
+            debt_to_equity = total_liabilities / total_equity if total_equity != 0 else np.nan
+            net_profit_margin = net_income / revenue if revenue != 0 else np.nan
+
+            st.write(f"**Current Ratio**: {current_ratio:.2f}")
+            st.write(f"**Debt-to-Equity Ratio**: {debt_to_equity:.2f}")
+            st.write(f"**Net Profit Margin**: {net_profit_margin:.2%}")
+
+            # Text Insight
+            if current_ratio > 1.5:
+                st.success(f"{ticker_symbol} has a strong liquidity position.")
+            if debt_to_equity > 2:
+                st.warning(f" {ticker_symbol} carries a relatively high level of debt compared to its equity.")
+            if net_profit_margin < 0:
+                st.error(f"🔻{ticker_symbol} is currently operating at a net loss.")
+
+        except Exception as e:
+            st.warning(f"Could not compute some ratios: {e}")
+
+        # -- Trend Plot for Revenue and Net Income
+        st.markdown("###  Trend Analysis of Revenue & Net Income")
+        try:
+            fig = go.Figure()
+            fig.add_trace(go.Scatter(x=financials.columns, y=financials.loc["Total Revenue"], mode='lines+markers', name="Revenue"))
+            fig.add_trace(go.Scatter(x=financials.columns, y=financials.loc["Net Income"], mode='lines+markers', name="Net Income"))
+
+            fig.update_layout(
+                title="Revenue and Net Income Over Time",
+                xaxis_title="Period",
+                yaxis_title="USD",
+                height=400
+            )
+            st.plotly_chart(fig)
+        except Exception as e:
+            st.warning(f"Trend plot failed: {e}")
+
 
     
      # Tab 5: stock history tab   
     with EDA_tab:
-        ###
+        
 
         st.markdown("<h4>Comparative EDA for Popular Stocks</h4>", unsafe_allow_html=True)
         tickers = ['AAPL','GOOGL','META','MSFT','TSLA','BTC-USD']
