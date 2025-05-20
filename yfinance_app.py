@@ -87,8 +87,11 @@ if start_date is not None and end_date is not None:
         # Tab 2, part 1 : ARIMA
        
         # Ensure DateTimeIndex for ARIMA
-        if 'Date' in stockData.columns:
-            stockData.set_index('Date', inplace=True)
+        # if 'Date' in stockData.columns:
+        #     stockData.set_index('Date', inplace=True)
+
+        # Reset index before modeling to ensure numeric RangeIndex
+        stockData.reset_index(drop=True, inplace=True)   
 
         # Split data into train and test
         train_size = int(len(stockData) * 0.7)
