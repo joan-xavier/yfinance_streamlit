@@ -18,16 +18,11 @@ from statsmodels.tsa.arima.model import ARIMA
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense
-
+import datetime
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 import plotly.graph_objects as go
-
-
- ### Details of YAhoo finance:
-#  The following ticker symbols   AAPL -apple stocks;  GOOGL - google;  MSFT- Microsoft
-
 
 
 # st.title("Real world Yahoo stocks Dashboard -Interactive App")
@@ -38,19 +33,24 @@ st.markdown('''
 
 **Credits**
 - App built by [Joanofarc Xavier](https://joan-xavier.github.io/portfolio/) 
-- Built in `Python` using `streamlit`,`yfinance`, `plotly`,`matplotlib`, `pandas`,`scikit learn`, `Tensorflow`and `datetime`
+- Built in `Python` using `streamlit`,`yfinance`, `plotly`,`matplotlib`,`seaborn`, `pandas`,`scikit learn`, `Tensorflow`and `datetime`
 - Trends and Patterns of popular stocks - META, GOOGL, AAPL(Apple), MSFT(Microsoft), TSLA (Tesla) BTC-USD(Bitcoin)
 - Time series Analysis -Stock Prediction using ARIMA, LSTM Models, Logistic Regression, SVM and XGBoost
 ''')
 st.write('---')
 
 # sidebar layout(start date, end date, ticker symbol, ma_window)
-st.sidebar.title(' Fill the stock details')
-ticker_symbol = st.sidebar.selectbox('Enter Ticker Symbol', ('AAPL','GOOGL','META','MSFT','TSLA','BTC-USD'))
-
+st.sidebar.title('Stock Settings')
+# ticker_symbol = st.sidebar.selectbox('Enter Ticker Symbol', ('AAPL','GOOGL','META','MSFT','TSLA','BTC-USD'))
+ticker_symbol = st.sidebar.selectbox("Ticker Symbol", ['AAPL', 'GOOGL', 'META', 'MSFT', 'TSLA', 'BTC-USD'])
 st.sidebar.write(" ### Trading Period")
-start_date = st.sidebar.date_input('Start Date', value=None)
-end_date =st.sidebar.date_input('End Date', value=None)
+
+
+# Set default to 1 year ago from today
+default_start = datetime.date.today() - datetime.timedelta(days=365)
+default_end = datetime.date.today()
+start_date = st.sidebar.date_input('Start Date', value=default_start)
+end_date =st.sidebar.date_input('End Date', value=default_end)
 
 
 trade_interval = st.sidebar.selectbox('Trading interval',("3mo", "1mo", "1wk", "5d", "1d", "1h", "90m", "30m", "15m"))
@@ -59,11 +59,24 @@ st.sidebar.write('#### m - minute, d -day, wk - week, mo - month')
 #get yfinance data on this ticker
 ticker = yf.Ticker(ticker_symbol)
 
-if start_date is not None and end_date is not None:
+# ------------------- Cache Data Download --------------------
+@st.cache_data(show_spinner=False)
+def load_data(ticker, start, end):
+    df = yf.download(ticker_symbol, start=start, end=end)
+    df.reset_index(inplace=True)
+    return df
+
+if start_date and end_date:
+    stockData = load_data(ticker_symbol, start_date, end_date)
+    if stockData.empty:
+        st.error("No data found for selected range.")
+        st.stop()
+
     # Fetching data
     st.write(f"Fetching data for **{ticker_symbol}** from {start_date} to {end_date}")
     st.subheader(f'{ticker_symbol} Stock Overview')
-    stockData = yf.download(ticker_symbol, start =start_date, end = end_date)
+    
+    # stockData = yf.download(ticker_symbol, start =start_date, end = end_date)
     # the data frame stockData has multiple indices
     if isinstance(stockData.columns, pd.MultiIndex):
         stockData.columns = stockData.columns.get_level_values(0)  # flatten columns
@@ -83,7 +96,8 @@ if start_date is not None and end_date is not None:
     # Tab 2, part 1 : Rolling window
     with prediction_tab:
         # Tab 2, part 1 : Rolling window
-        st.subheader("Stock Prediction using Time series - ARIMA/SARIMA/ARIMAX Models")
+        st.subheader("Stock Prediction using Time series - ARIMA/SARIMA/ARIMAX/LSTM Models")
+        st.write('''##### Models are trained to forecast stock prices and their accuracy is evaluated using past data''')
         ma_window = st.slider("Rolling Window Size (in Days)", min_value=5, max_value=50, value=10)
         # Calculate Rolling Mean and Standard Deviation
         
@@ -131,7 +145,7 @@ if start_date is not None and end_date is not None:
         # Display the chart
         st.plotly_chart(fig)
 
-        #$$$$$$$$$$$$$$$$$$$$$4
+        
         # Tab 2 , part 2: ARIMA
    
         # Ensure DateTimeIndex for ARIMA
@@ -179,15 +193,15 @@ if start_date is not None and end_date is not None:
         plt.legend()
         plt.show()
         st.pyplot(plt)
-         # Reset index AFTER forecasting
+        #  Reset index AFTER forecasting
         stockData.reset_index(inplace=True)
-        #$$$$$$$$$$$$$$$$$$$
+        
 
         # Tab 2, part 3: LSTM
 
-        # %%%%%%%%%%%%%%%%%%
+        
         # Streamlit App Title
-        st.subheader("LSTM Stock Price Prediction Dashboard")
+        st.subheader("Stock Price Prediction using RNN based LSTM Model ")
         seq_length = st.selectbox("Forecasting sequence length in days", (1, 7, 14, 30, 45, 60))
 
         # Data Fetching
@@ -271,11 +285,11 @@ if start_date is not None and end_date is not None:
         y_test = scaler.inverse_transform(y_test.reshape(-1, 1))
 
         # Mean Squared Error
-        train_mse = mean_squared_error(y_train, train_predict)
-        test_mse = mean_squared_error(y_test, test_predict)
+        train_rmse = np.sqrt(mean_squared_error(y_train, train_predict))
+        test_rmse = np.sqrt(mean_squared_error(y_test, test_predict))
 
-        st.success(f"Training MSE: {train_mse:.4f}")
-        st.success(f"Testing MSE: {test_mse:.4f}")
+        st.success(f"Training RMSE: {train_rmse:.4f}")
+        st.success(f"Testing RMSE: {test_rmse:.4f}")
 
         # Plotting the results
         plt.figure(figsize=(14, 7))
@@ -308,12 +322,12 @@ if start_date is not None and end_date is not None:
         plt.legend()
         st.pyplot(plt)
 
-    # %%%%%%%%%%%%%%%%%%##################3
+    
         # Tab 2, part 4 : ROC-AUC Evaluation using SVM, XGBoost and Logistic Regression
         st.markdown("""
 ###  ROC-AUC Evaluation for Stock Movement (Up/Down) Prediction
 
-- In this classification task, prediction is maade on whether a stock's **closing price will go up the next day (1)** or **not (0)**.
+- In this classification task, prediction is made on whether a stock's **closing price will go up the next day (1)** or **not (0)**.
 - Instead of just predicting **hard labels** like 0 or 1, these ML models generate **soft probabilities** — values between 0 and 1 — indicating the **confidence** that the stock will rise.
 - The **ROC curve** plots the **True Positive Rate (correctly predicting upward movement)** vs. the **False Positive Rate (incorrectly predicting upward movement)** at various threshold levels.
 - The **AUC (Area Under the Curve)** gives a single performance score:
@@ -374,12 +388,12 @@ if start_date is not None and end_date is not None:
         best_model = max(auc_scores, key=auc_scores.get)
         st.success(f"Best Model: **{best_model}** with ROC-AUC = {auc_scores[best_model]:.4f}")
 
-    # ################################3
+    # 
     # Tab 3: charts tab
     with chart_tab:
         
         st.write(f" ### {ticker_symbol} Charts with High, low, close prices and Volume (total no of shares traded) for the specified interval ")
-        ########### 4a.
+        #4a.
 
         st.subheader("High Price, Low Price in (USD) and Volume")
 
@@ -406,7 +420,7 @@ if start_date is not None and end_date is not None:
         plt.show()
         st.pyplot(fig)
 
-        ### 4c. 
+        # 4c. 
         # Bollinger bands
         st.subheader(f' Bollinger Bands for {ticker_symbol}')
         st.markdown(''' #### To visualize price volatility and potential overbought/oversold conditions on stock charts [Click for more details](https://www.fidelity.com/learning-center/trading-investing/technical-analysis/technical-indicator-guide/bollinger-bands)''')
@@ -417,7 +431,7 @@ if start_date is not None and end_date is not None:
         st.plotly_chart(fig)
         
 
-        ### 4d.
+        # 4d.
         st.subheader(f"Closing Price in (USD) with {ma_window}-Days Moving Average")
         fig, ax = plt.subplots(figsize=(10, 5))
         ax.plot(stockData.index, stockData['Close'], label="Closing Price", color='blue')
@@ -443,7 +457,7 @@ if start_date is not None and end_date is not None:
     with EDA_tab:
         ###
 
-        st.header(" Comparative EDA for Popular Stocks")
+        st.markdown("<h4>Comparative EDA for Popular Stocks</h4>", unsafe_allow_html=True)
         tickers = ['AAPL','GOOGL','META','MSFT','TSLA','BTC-USD']
 
         st.info("Fetching and comparing data for: AAPL, GOOGL, META, MSFT, TSLA, BTC-USD")
@@ -456,37 +470,90 @@ if start_date is not None and end_date is not None:
         correlation = returns.corr()
 
         # -- 1. Cumulative Returns Line Chart
-        st.subheader(" Cumulative Returns")
-        fig1 = px.line(cumulative_returns, title="Cumulative Returns Over Time")
+                # Custom color mapping for tickers
+        tickers = cumulative_returns.columns
+        ticker_colors = px.colors.qualitative.Plotly  # Use any other palette if preferred
+        color_map = {ticker: ticker_colors[i % len(ticker_colors)] for i, ticker in enumerate(tickers)}
+
+        # -- 1. Cumulative Returns Line Chart
+        st.subheader("Cumulative Returns")
+        fig1 = px.line(
+            cumulative_returns,
+            title="Cumulative Returns Over Time",
+            color_discrete_map=color_map
+        )
         st.plotly_chart(fig1)
 
-        # -- 2. Risk vs Return Scatter
+        # -- 2. Risk vs Return Scatter Plot
         st.subheader("Risk vs Return (Volatility vs Mean Return)")
-        fig2 = px.scatter(x=risk, y=mean_return, text=risk.index,
-                        labels={"x": "Risk (Std Dev)", "y": "Mean Return"},
-                        title="Risk vs Return")
+        risk_return_df = pd.DataFrame({
+            "Ticker": tickers,
+            "Risk": risk.values,
+            "Mean Return": mean_return.values
+        })
+
+        fig2 = px.scatter(
+            risk_return_df,
+            x="Risk",
+            y="Mean Return",
+            text="Ticker",
+            color="Ticker",
+            title="Risk vs Return",
+            labels={"Risk": "Risk (Std Dev)", "Mean Return": "Mean Return"},
+            color_discrete_map=color_map
+        )
         fig2.update_traces(marker=dict(size=12), textposition='top center')
         st.plotly_chart(fig2)
 
         # -- 3. Bar Chart of Risk and Return
         st.subheader("Bar Chart of Risk and Mean Return")
-        risk_return_df = pd.DataFrame({'Risk': risk, 'Mean Return': mean_return})
         st.dataframe(risk_return_df)
 
-        fig3 = go.Figure(data=[
-            go.Bar(name='Risk', x=risk.index, y=risk.values),
-            go.Bar(name='Mean Return', x=mean_return.index, y=mean_return.values)
-        ])
-        fig3.update_layout(barmode='group', title="Risk and Mean Return for Each Ticker")
+        fig3 = go.Figure()
+
+        # Plot each ticker with matching colors
+        for ticker in tickers:
+            fig3.add_trace(go.Bar(
+                name=f'{ticker} - Risk',
+                x=[ticker],
+                y=[risk[ticker]],
+                marker_color=color_map[ticker]
+            ))
+            fig3.add_trace(go.Bar(
+                name=f'{ticker} - Mean Return',
+                x=[ticker],
+                y=[mean_return[ticker]],
+                marker_color=color_map[ticker],
+                opacity=0.5  # faded to distinguish from risk
+            ))
+
+        fig3.update_layout(
+            barmode='group',
+            title="Risk and Mean Return for Each Ticker",
+            xaxis_title="Ticker",
+            yaxis_title="Value",
+            width=900,
+            height=500
+        )
         st.plotly_chart(fig3)
 
         # -- 4. Correlation Heatmap
-        st.subheader("Correlation Between Assets")
-        fig4 = px.imshow(correlation, text_auto=True, title="Correlation Matrix of Daily Returns")
+        
+        st.markdown("<h4 style='color:#336699;'>Correlation Between Assets</h4>", unsafe_allow_html=True)
+
+        fig4 = px.imshow(
+            correlation,
+            text_auto=".2f",
+            title="Correlation Matrix of Daily Returns",
+            color_continuous_scale='Viridis',
+            width=700,
+            height=600
+        )
+        fig4.update_layout(font=dict(size=12), title_font_size=18)
         st.plotly_chart(fig4)
 
         # -- 5. Up vs Down Days Confusion Matrix
-        st.subheader("Confusion Matrix: Movement Consistency")
+        st.markdown("<h4 style='color:#336699;'>Confusion Matrix: Movement Consistency</h4>", unsafe_allow_html=True)
 
         for ticker in tickers:
             direction = np.where(returns[ticker] > 0, 1, 0)
@@ -494,10 +561,8 @@ if start_date is not None and end_date is not None:
             y_pred = direction[1:]
             cm = confusion_matrix(y_true, y_pred)
 
-            # Smaller figure size
-            fig, ax = plt.subplots(figsize=(1, 1))  # width, height in inches
+            fig, ax = plt.subplots(figsize=(2, 2), dpi=150)  # Higher resolution
 
-            # Heatmap with small annotation text
             sns.heatmap(
                 cm,
                 annot=True,
@@ -506,21 +571,18 @@ if start_date is not None and end_date is not None:
                 cbar=False,
                 xticklabels=['Down', 'Up'],
                 yticklabels=['Down', 'Up'],
-                annot_kws={"size": 3},  # smaller numbers
+                annot_kws={"size": 8},
                 ax=ax
             )
 
-            # Axis label and title font sizes
-            ax.set_title(f'{ticker}', fontsize=5)
-            ax.set_xlabel('Predicted', fontsize=5)
-            ax.set_ylabel('Actual', fontsize=5)
-            ax.tick_params(axis='both', labelsize=3)  # smaller tick labels
+            ax.set_title(f'{ticker}', fontsize=10, fontweight='bold')
+            ax.set_xlabel('Predicted', fontsize=9)
+            ax.set_ylabel('Actual', fontsize=9)
+            ax.tick_params(axis='both', labelsize=8)
 
-            # Render in Streamlit
             st.pyplot(fig)
 
-        ####
-else:
-    st.error("No data found. Please choose the 'ticker symbol' and 'date range' of your choice from the Side bar.")
-    st.stop()
+
+        
+
 
