@@ -91,58 +91,58 @@ if start_date is not None and end_date is not None:
         #     stockData.set_index('Date', inplace=True)
 
         # Reset index before modeling to ensure numeric RangeIndex
-        stockData.reset_index(drop=True, inplace=True)   
+        # stockData.reset_index(drop=True, inplace=True)   
 
-        # Split data into train and test
-        train_size = int(len(stockData) * 0.7)
-        train, test = stockData.iloc[:train_size], stockData.iloc[train_size:]
+        # # Split data into train and test
+        # train_size = int(len(stockData) * 0.7)
+        # train, test = stockData.iloc[:train_size], stockData.iloc[train_size:]
 
-        # ARIMA model
-        arima_model = ARIMA(train["Close"], order=(1,1,1))  
-        arima_fit = arima_model.fit()
-        # arima_forecast = arima_fit.forecast(steps=len(test))
-        arima_forecast = arima_fit.get_forecast(steps=len(test)).predicted_mean
-
-
-        # ARIMAX model (adding exogenous variable if available, e.g., 'Volume')
-        if 'Volume' in stockData.columns:
-            arimax_model = SARIMAX(train["Close"], exog=train["Volume"], order=(1,1,1))
-            arimax_fit = arimax_model.fit()
-            # arimax_forecast = arimax_fit.forecast(steps=len(test), exog=test["Volume"])
-            arimax_forecast = arimax_fit.get_forecast(steps=len(test), exog=test["Volume"]).predicted_mean
+        # # ARIMA model
+        # arima_model = ARIMA(train["Close"], order=(1,1,1))  
+        # arima_fit = arima_model.fit()
+        # # arima_forecast = arima_fit.forecast(steps=len(test))
+        # arima_forecast = arima_fit.get_forecast(steps=len(test)).predicted_mean
 
 
-        else:
-            print("No exogenous variable available for ARIMAX; using ARIMA instead.")
-            arimax_forecast = arima_forecast
+        # # ARIMAX model (adding exogenous variable if available, e.g., 'Volume')
+        # if 'Volume' in stockData.columns:
+        #     arimax_model = SARIMAX(train["Close"], exog=train["Volume"], order=(1,1,1))
+        #     arimax_fit = arimax_model.fit()
+        #     # arimax_forecast = arimax_fit.forecast(steps=len(test), exog=test["Volume"])
+        #     arimax_forecast = arimax_fit.get_forecast(steps=len(test), exog=test["Volume"]).predicted_mean
 
-        # SARIMA model
-        sarima_model = SARIMAX(train["Close"], order=(1,1,1), seasonal_order=(1,1,1,12))
-        sarima_fit = sarima_model.fit()
-        # sarima_forecast = sarima_fit.forecast(steps=len(test))
-        sarima_forecast = sarima_fit.get_forecast(steps=len(test)).predicted_mean
 
-        # Plot the results
-        plt.figure(figsize=(14,7))
+        # else:
+        #     print("No exogenous variable available for ARIMAX; using ARIMA instead.")
+        #     arimax_forecast = arima_forecast
 
-        # Actual data
-        plt.plot(train.index, train["Close"], label='Train', color='#203147')
-        plt.plot(test.index, test["Close"], label='Test', color='#01ef63')
+        # # SARIMA model
+        # sarima_model = SARIMAX(train["Close"], order=(1,1,1), seasonal_order=(1,1,1,12))
+        # sarima_fit = sarima_model.fit()
+        # # sarima_forecast = sarima_fit.forecast(steps=len(test))
+        # sarima_forecast = sarima_fit.get_forecast(steps=len(test)).predicted_mean
 
-        # Forecasts
-        plt.plot(test.index, arima_forecast, label='ARIMA Forecast', color='orange', linestyle='--')
-        plt.plot(test.index, arimax_forecast, label='ARIMAX Forecast', color='blue', linestyle='-.')
-        plt.plot(test.index, sarima_forecast, label='SARIMA Forecast', color='red', linestyle=':')
+        # # Plot the results
+        # plt.figure(figsize=(14,7))
 
-        # Title and labels
-        plt.title('Comparison of ARIMA, ARIMAX, and SARIMA Models')
-        plt.xlabel('Date')
-        plt.ylabel('Close Price')
-        plt.legend()
-        plt.show()
-        st.pyplot(plt)
-        #  Reset index AFTER forecasting
-        stockData.reset_index(inplace=True)
+        # # Actual data
+        # plt.plot(train.index, train["Close"], label='Train', color='#203147')
+        # plt.plot(test.index, test["Close"], label='Test', color='#01ef63')
+
+        # # Forecasts
+        # plt.plot(test.index, arima_forecast, label='ARIMA Forecast', color='orange', linestyle='--')
+        # plt.plot(test.index, arimax_forecast, label='ARIMAX Forecast', color='blue', linestyle='-.')
+        # plt.plot(test.index, sarima_forecast, label='SARIMA Forecast', color='red', linestyle=':')
+
+        # # Title and labels
+        # plt.title('Comparison of ARIMA, ARIMAX, and SARIMA Models')
+        # plt.xlabel('Date')
+        # plt.ylabel('Close Price')
+        # plt.legend()
+        # plt.show()
+        # st.pyplot(plt)
+        # #  Reset index AFTER forecasting
+        # stockData.reset_index(inplace=True)
         #$$$$$$$$$$$$$$$$$$$
 
         # Tab 2, part 2 : Rolling window
