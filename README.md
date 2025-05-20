@@ -7,14 +7,36 @@ An interactive data science web app for stock price analysis and prediction usin
 
 While many stock prediction projects focus on just one model, this project uniquely combines multiple forecasting models, classification algorithms, EDA, feature engineering, time series models and deep learning in a single interactive app.
 
-- **Real-time Data Handling**: Integration with live financial data from Yahoo Finance using `yfinance`.
--  **Time Series Forecasting**: Predicting future stock prices using:
-  - **ARIMA / ARIMAX**, **SARIMA**,**LSTM (Deep Learning)**
--  **Machine Learning for Classification**: Predict whether a stock will rise using:
-  - **Logistic Regression**,**SVM**, **XGBoost**
--  **Interactive Data Visualizations**: Created using `Plotly`, `Matplotlib`, and `Cufflinks`.
--  **EDA Automation**: Using `pandas-profiling` (`ydata_profiling`) for quick and deep insights into the dataset.
-- **Skill Development**: Showcases model evaluation using ROC-AUC and Mean Squared Error (MSE), and applies data preprocessing techniques like scaling and sequence generation for LSTM.
+ 
+ 1. Live Data Ingestion & Preprocessing
+•	Pulled real-time historical stock data from Yahoo Finance API using yfinance.
+•	Enabled user-configurable date ranges, trading intervals, and stock tickers.
+•	Applied rolling window functions for moving average & volatility indicators.
+
+ 2. Time Series Forecasting with ARIMA, SARIMA, and ARIMAX
+•	Trained and evaluated classical models (ARIMA, SARIMA, ARIMAX) to forecast closing prices.
+•	Visualized model outputs against test data for performance comparison.
+•	Integrated exogenous variables like volume for enhanced ARIMAX prediction.
+
+ 3. Deep Learning with LSTM for Stock Price Prediction
+•	Built an LSTM-based Recurrent Neural Network using TensorFlow/Keras for multi-day sequence prediction.
+•	Normalized data using MinMaxScaler and structured temporal input for training.
+•	Reported and visualized RMSE for both training and test sets to assess performance.
+
+4. Stock Movement Classification with ML Models
+•	Engineered target labels for price direction prediction (Up/Down) over customizable horizons.
+•	Implemented Logistic Regression, Support Vector Machine, and XGBoost classifiers.
+•	Evaluated classifiers using ROC-AUC curves and highlighted the best-performing model.
+
+ 5. Interactive EDA & Comparative Insights Across Tickers
+•	Compared multiple stocks (AAPL, GOOGL, TSLA, BTC, etc.) on:
+o	Cumulative Returns
+o	Volatility vs Return
+o	Bar Charts of Risk/Reward
+o	Correlation Heatmaps
+o	Confusion Matrices of directional consistency.
+•	Enabled full visualization using Plotly, Seaborn, and Matplotlib with responsive layouts in Streamlit.
+
 
 ## Features
 
@@ -43,6 +65,7 @@ While many stock prediction projects focus on just one model, this project uniqu
 ### 1. Clone the Repo
 
 ### 2. Install dependancies
+This project uses python 3.11, and the common data science libraries
 
 pip install -r requirements.txt
 
