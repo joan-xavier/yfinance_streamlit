@@ -136,7 +136,7 @@ if start_date is not None and end_date is not None:
         #$$$$$$$$$$$$$$$$$$$
 
         # Tab 2, part 2 : Rolling window
-         ma_window = st.slider("Rolling Window Size (in Days)", min_value=5, max_value=50, value=10)
+        ma_window = st.slider("Rolling Window Size (in Days)", min_value=5, max_value=50, value=10)
         # Calculate Rolling Mean and Standard Deviation
         
         stockData['roll_mean'] = stockData['Close'].rolling(window=ma_window).mean()
