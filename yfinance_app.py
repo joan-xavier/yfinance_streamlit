@@ -80,11 +80,12 @@ if start_date is not None and end_date is not None:
 
      
     # Tab 2: Stock Data for Prediction
-    # Tab 2, part 1 : Rolling window
+    
     with prediction_tab:
         #$$$$$$$$$$$$$$$$$$$$$4
-        # Tab 2 , part 2: ARIMA
-   
+        st.subheader("Stock Prediction using Time series - ARIMA/SARIMA/ARIMAX Models")
+        # Tab 2, part 1 : ARIMA
+       
         # Ensure DateTimeIndex for ARIMA
         if 'Date' in stockData.columns:
             stockData.set_index('Date', inplace=True)
@@ -134,9 +135,8 @@ if start_date is not None and end_date is not None:
         stockData.reset_index(inplace=True)
         #$$$$$$$$$$$$$$$$$$$
 
-        # Tab 2, part 1 : Rolling window
-        st.subheader("Stock Prediction using Time series - ARIMA/SARIMA/ARIMAX Models")
-        ma_window = st.slider("Rolling Window Size (in Days)", min_value=5, max_value=50, value=10)
+        # Tab 2, part 2 : Rolling window
+         ma_window = st.slider("Rolling Window Size (in Days)", min_value=5, max_value=50, value=10)
         # Calculate Rolling Mean and Standard Deviation
         
         stockData['roll_mean'] = stockData['Close'].rolling(window=ma_window).mean()
