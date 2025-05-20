@@ -133,6 +133,11 @@ if start_date is not None and end_date is not None:
 
         #$$$$$$$$$$$$$$$$$$$$$4
         # Tab 2 , part 2: ARIMA
+   
+        # Ensure DateTimeIndex for ARIMA
+        if 'Date' in stockData.columns:
+            stockData.set_index('Date', inplace=True)
+
         # Split data into train and test
         train_size = int(len(stockData) * 0.7)
         train, test = stockData.iloc[:train_size], stockData.iloc[train_size:]
@@ -174,6 +179,8 @@ if start_date is not None and end_date is not None:
         plt.legend()
         plt.show()
         st.pyplot(plt)
+        #  Reset index AFTER forecasting
+        stockData.reset_index(inplace=True)
         #$$$$$$$$$$$$$$$$$$$
 
         # Tab 2, part 3: LSTM
