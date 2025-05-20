@@ -260,7 +260,7 @@ if start_date and end_date:
 
         # Model Building
         model = Sequential([
-            LSTM(50, return_sequences=False, input_shape=(seq_length, 1)),
+            LSTM(30, return_sequences=False, input_shape=(seq_length, 1)),
             Dense(25),
             Dense(1)
         ])
