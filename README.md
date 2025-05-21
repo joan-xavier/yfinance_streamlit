@@ -48,7 +48,7 @@ While many stock prediction projects focus on just one model, this project uniqu
   - **LSTM (Deep Learning)** for sequence learning and price forecasting.
 - **ROC-AUC Based Classification**: Predict stock movement using ML classifiers.
 - **Financial Reports**: Retrieve balance sheets and financials directly from Yahoo Finance.
--  **Automated EDA**: Generate detailed data profiling reports with one click.
+-  **Automated EDA**: Generate detailed data profiling reports and full visualization with one click.
 
 ##  Tech Stack
 
@@ -58,7 +58,7 @@ While many stock prediction projects focus on just one model, this project uniqu
   - `scikit-learn`, `XGBoost`, `statsmodels`
   - `TensorFlow Keras` for LSTM
   - `matplotlib`, `plotly`, `cufflinks`
-- **EDA**: `ydata-profiling`, `streamlit-pandas-profiling`
+- **EDA**: `pandas, `numpy`,`matplotlib`, `plotly`, `streamlit-pandas-profiling`
 
 ## Getting Started
 
