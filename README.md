@@ -9,33 +9,33 @@ While many stock prediction projects focus on just one model, this project uniqu
 
  
  1. Live Data Ingestion & Preprocessing
-•	Pulled real-time historical stock data from Yahoo Finance API using yfinance.
-•	Enabled user-configurable date ranges, trading intervals, and stock tickers.
-•	Applied rolling window functions for moving average & volatility indicators.
+ - Pulled real-time historical stock data from Yahoo Finance API using yfinance.
+ -	Enabled user-configurable date ranges, trading intervals, and stock tickers.
+ -	Applied rolling window functions for moving average & volatility indicators.
 
  2. Time Series Forecasting with ARIMA, SARIMA, and ARIMAX
-•	Trained and evaluated classical models (ARIMA, SARIMA, ARIMAX) to forecast closing prices.
-•	Visualized model outputs against test data for performance comparison.
-•	Integrated exogenous variables like volume for enhanced ARIMAX prediction.
+ -	Trained and evaluated classical models (ARIMA, SARIMA, ARIMAX) to forecast closing prices.
+ -	Visualized model outputs against test data for performance comparison.
+ -	Integrated exogenous variables like volume for enhanced ARIMAX prediction.
 
  3. Deep Learning with LSTM for Stock Price Prediction
-•	Built an LSTM-based Recurrent Neural Network using TensorFlow/Keras for multi-day sequence prediction.
-•	Normalized data using MinMaxScaler and structured temporal input for training.
-•	Reported and visualized RMSE for both training and test sets to assess performance.
+ -	Built an LSTM-based Recurrent Neural Network using TensorFlow/Keras for multi-day sequence prediction.
+ -	Normalized data using MinMaxScaler and structured temporal input for training.
+ -	Reported and visualized RMSE for both training and test sets to assess performance.
 
 4. Stock Movement Classification with ML Models
-•	Engineered target labels for price direction prediction (Up/Down) over customizable horizons.
-•	Implemented Logistic Regression, Support Vector Machine, and XGBoost classifiers.
-•	Evaluated classifiers using ROC-AUC curves and highlighted the best-performing model.
+ -	Engineered target labels for price direction prediction (Up/Down) over customizable horizons.
+ -	Implemented Logistic Regression, Support Vector Machine, and XGBoost classifiers.
+ -	Evaluated classifiers using ROC-AUC curves and highlighted the best-performing model.
 
  5. Interactive EDA & Comparative Insights Across Tickers
-•	Compared multiple stocks (AAPL, GOOGL, TSLA, BTC, etc.) on:
-o	Cumulative Returns
-o	Volatility vs Return
-o	Bar Charts of Risk/Reward
-o	Correlation Heatmaps
-o	Confusion Matrices of directional consistency.
-•	Enabled full visualization using Plotly, Seaborn, and Matplotlib with responsive layouts in Streamlit.
+ -	Compared multiple stocks (AAPL, GOOGL, TSLA, BTC, etc.) on:
+   -	Cumulative Returns
+   -	Volatility vs Return
+   -	Bar Charts of Risk/Reward
+   -	Correlation Heatmaps
+   -	Confusion Matrices of directional consistency.
+-	Enabled full visualization using Plotly, Seaborn, and Matplotlib with responsive layouts in Streamlit.
 
 
 ## Features
